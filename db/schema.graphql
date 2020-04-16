@@ -1,0 +1,92 @@
+"""
+Objeto del cliente
+"""
+type Cliente {
+  id: ID
+  nombre: String
+  apellido: String
+  empresa: String
+  emails: [Email]
+  edad: Int
+  tipo: TipoCliente
+  pedidos: [Pedido]
+}
+
+"""
+Objeto Email
+"""
+type Email {
+  email: String
+}
+
+"""
+Objeto Pedido
+"""
+type Pedido {
+  producto: String
+  precio: Int
+}
+
+"""
+Categoria del cliente
+"""
+enum TipoCliente {
+  BASICO
+  PREMIUM
+}
+
+"""
+Se obtiene la informacion del cliente por ID
+"""
+type Query {
+  getClientes(limite: Int): [Cliente]
+  getCliente(id: ID): Cliente
+}
+
+"""
+Objeto emails nuevos
+"""
+input EmailInput {
+  email: String
+}
+
+"""
+Objeto Pedido nuevos
+"""
+input PedidoInput {
+  producto: String
+  precio: Int
+}
+
+"""
+Campos para los clientes nuevos
+"""
+input ClienteInput {
+  id: ID
+  nombre: String!
+  apellido: String!
+  empresa: String!
+  emails: [EmailInput]
+  edad: Int!
+  tipo: TipoCliente!
+  pedidos: [PedidoInput]
+}
+"""
+Mutations para crear nuevos Clientes
+"""
+type Mutation {
+  #Nombre del Resolver, Input con datos y valor que retorna
+  """
+  Permite crear nuevos clientes
+  """
+  crearCliente(input: ClienteInput): Cliente
+  """
+  Permite actualizar clientes
+  """
+  actualizarCliente(input: ClienteInput): Cliente
+
+  """
+  Eliminar Cliente
+  """
+  eliminarCliente(id: ID!): String
+}
