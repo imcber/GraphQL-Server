@@ -2,25 +2,19 @@ import mongoose, { connect, mongo } from "mongoose";
 
 //definicion del schema de Usuarios
 
-const UsuarioSchema = new mongoose.Schema({
+const ProductoSchema = new mongoose.Schema({
   nombre: {
     type: String,
     required: true,
     trim: true,
   },
-  apellido: {
-    type: String,
+  existencia: {
+    type: Number,
     required: true,
     trim: true,
   },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true,
-  },
-  password: {
-    type: String,
+  precio: {
+    type: Number,
     required: true,
     trim: true,
   },
@@ -30,6 +24,6 @@ const UsuarioSchema = new mongoose.Schema({
   },
 });
 
-const Usuario = mongoose.model("Usuario", UsuarioSchema);
+const Producto = mongoose.model("Producto", ProductoSchema);
 
-export { Usuario };
+export { Producto };

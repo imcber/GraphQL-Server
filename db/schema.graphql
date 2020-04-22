@@ -1,92 +1,54 @@
-"""
-Objeto del cliente
-"""
-type Cliente {
+type Usuario {
   id: ID
   nombre: String
   apellido: String
-  empresa: String
-  emails: [Email]
-  edad: Int
-  tipo: TipoCliente
-  pedidos: [Pedido]
-}
-
-"""
-Objeto Email
-"""
-type Email {
   email: String
+  creado: String
 }
 
-"""
-Objeto Pedido
-"""
-type Pedido {
-  producto: String
-  precio: Int
+type Token {
+  token: String
 }
 
-"""
-Categoria del cliente
-"""
-enum TipoCliente {
-  BASICO
-  PREMIUM
-}
-
-"""
-Se obtiene la informacion del cliente por ID
-"""
-type Query {
-  getClientes(limite: Int): [Cliente]
-  getCliente(id: ID): Cliente
-}
-
-"""
-Objeto emails nuevos
-"""
-input EmailInput {
-  email: String
-}
-
-"""
-Objeto Pedido nuevos
-"""
-input PedidoInput {
-  producto: String
-  precio: Int
-}
-
-"""
-Campos para los clientes nuevos
-"""
-input ClienteInput {
+type Producto {
   id: ID
+  nombre: String
+  existencia: Int
+  precio: Float
+  creado: String
+}
+
+input UsuarioInput {
   nombre: String!
   apellido: String!
-  empresa: String!
-  emails: [EmailInput]
-  edad: Int!
-  tipo: TipoCliente!
-  pedidos: [PedidoInput]
+  email: String!
+  password: String!
 }
-"""
-Mutations para crear nuevos Clientes
-"""
-type Mutation {
-  #Nombre del Resolver, Input con datos y valor que retorna
-  """
-  Permite crear nuevos clientes
-  """
-  crearCliente(input: ClienteInput): Cliente
-  """
-  Permite actualizar clientes
-  """
-  actualizarCliente(input: ClienteInput): Cliente
 
-  """
-  Eliminar Cliente
-  """
-  eliminarCliente(id: ID!): String
+input AutenticarInput {
+  email: String!
+  password: String!
+}
+
+input ProductoInput {
+  nombre: String!
+  existencia: Int!
+  precio: Float!
+}
+
+type Mutation {
+  #Usuario
+  nuevoUsuario(input: UsuarioInput): Usuario
+  autenticarUsuario(input: AutenticarInput): Token
+
+  #Producto
+  nuevoProducto(input: ProductoInput): Producto
+}
+
+type Query {
+  #Usuarios
+  obtenerUsuario(token: String!): Usuario
+  #Productos
+  obtenerProductos: [Producto]
+  obtenerProducto(id: ID!): Producto
 }

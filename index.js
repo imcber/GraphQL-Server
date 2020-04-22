@@ -3,6 +3,8 @@ import { ApolloServer } from "apollo-server-express";
 import { typeDefs } from "./db/schema";
 import { resolvers } from "./db/resolvers";
 
+require("dotenv").config({ path: "variables.env" });
+
 const app = express();
 const server = new ApolloServer({ typeDefs, resolvers });
 
@@ -19,4 +21,4 @@ import dotenv from "dotenv";
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect("mongodb://localhost/clientes", { useNewUrlParser: true });
+mongoose.connect(process.env.DB_MONGO, { useNewUrlParser: true });
