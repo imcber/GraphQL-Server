@@ -1,3 +1,6 @@
+"""
+Este es el usuario que se loggea
+"""
 type Usuario {
   id: ID
   nombre: String
@@ -5,7 +8,9 @@ type Usuario {
   email: String
   creado: String
 }
-
+"""
+token para la conexion
+"""
 type Token {
   token: String
 }
@@ -18,6 +23,18 @@ type Producto {
   creado: String
 }
 
+type Cliente {
+  id: ID
+  nombre: String
+  apellido: String
+  empresa: String
+  email: String
+  telefono: String
+  creado: String
+  vendedor: ID
+}
+
+#INPUTS
 input UsuarioInput {
   nombre: String!
   apellido: String!
@@ -36,6 +53,14 @@ input ProductoInput {
   precio: Float!
 }
 
+input ClienteInput {
+  nombre: String!
+  apellido: String!
+  empresa: String
+  email: String!
+  telefono: String
+}
+
 type Mutation {
   #Usuario
   nuevoUsuario(input: UsuarioInput): Usuario
@@ -43,6 +68,13 @@ type Mutation {
 
   #Producto
   nuevoProducto(input: ProductoInput): Producto
+  actualizarProducto(id: ID, input: ProductoInput): Producto
+  eliminarProducto(id: ID!): String
+
+  #Clientes
+  nuevoCliente(input: ClienteInput): Cliente
+  actualizarCliente(id: ID!, input: ClienteInput): Cliente
+  eliminarCliente(id: ID!): String
 }
 
 type Query {
@@ -51,4 +83,8 @@ type Query {
   #Productos
   obtenerProductos: [Producto]
   obtenerProducto(id: ID!): Producto
+  #Clientes
+  obtenerClientes: [Cliente]
+  obtenerClientesXVendedor: [Cliente]
+  obtenerClienteId(id: ID!): Cliente
 }

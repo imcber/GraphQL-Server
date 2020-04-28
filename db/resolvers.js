@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Usuario } from "../models/Usuario";
 import { Producto } from "../models/Producto";
+import { Cliente } from "../models/Clientes";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +11,7 @@ const creatToken = (usuario, secreta, expiresIn) => {
   console.log(usuario);
   const { id, email, nombre, apellido } = usuario;
 
-  return jwt.sign({ id, nombre }, secreta, { expiresIn });
+  return jwt.sign({ id }, secreta, { expiresIn });
 };
 
 export const resolvers = {
@@ -30,6 +31,28 @@ export const resolvers = {
         throw new Error("Producto no encontrado");
       }
       return producto;
+    },
+    obtenerClientes: async () => {
+      return await Cliente.find({});
+    },
+    obtenerClientesXVendedor: async (_, {}, { usuario }) => {
+      const clientes = await Cliente.find({ vendedor: usuario.id.toString() });
+
+      if (!clientes) {
+        throw new Error("Clientes no encontrados");
+      }
+      return clientes;
+    },
+    obtenerClienteId: async (_, { id }, { usuario }) => {
+      const cliente = await Cliente.findById(id);
+      if (!cliente) {
+        throw new Error("Cliente no encontrado");
+      }
+      const { vendedor } = cliente;
+      if (vendedor.toString() !== usuario.id.toString()) {
+        throw new Error("Cliente de otro vendedor");
+      }
+      return cliente;
     },
   },
   Mutation: {
@@ -86,6 +109,66 @@ export const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    },
+    actualizarProducto: async (_, { id, input }) => {
+      let producto = await Producto.findById(id);
+      if (!producto) {
+        throw new Error("Producto no encontrado");
+      }
+
+      producto = await Producto.findOneAndUpdate({ _id: id }, input, {
+        new: true,
+      });
+      return producto;
+    },
+    eliminarProducto: async (_, { id }) => {
+      let producto = await Producto.findById(id);
+      if (!producto) {
+        throw new Error("Producto no encontrado");
+      }
+      await Producto.findOneAndDelete({ _id: id });
+
+      return "Producto Eliminado";
+    },
+    nuevoCliente: async (_, { input }, { usuario }) => {
+      //verificar si existe
+      const { email } = input;
+      const existeCliente = await Cliente.findOne({ email });
+
+      if (existeCliente) {
+        throw new Error("El cliente ya existe");
+      }
+
+      const nuevoCliente = new Cliente(input);
+
+      nuevoCliente.vendedor = usuario.id;
+
+      try {
+        const resultado = await nuevoCliente.save();
+        return resultado;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    actualizarCliente: async (_, { id, input }) => {
+      let cliente = await Cliente.findById(id);
+      if (!cliente) {
+        throw new Error("Cliente no existe");
+      }
+      cliente = await Cliente.findOneAndUpdate({ _id: id }, input, {
+        new: true,
+      });
+
+      return cliente;
+    },
+    eliminarCliente: async (_, { id }) => {
+      let cliente = await Cliente.findById(id);
+      if (!cliente) {
+        throw new Error("Cliente no existe");
+      }
+      await Cliente.findOneAndDelete({ _id: id });
+
+      return "Cliente eliminado";
     },
   },
 };
