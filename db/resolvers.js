@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Usuario } from "../models/Usuario";
 import { Producto } from "../models/Producto";
 import { Cliente } from "../models/Clientes";
+import { Pedido } from "../models/Pedido";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -150,25 +151,72 @@ export const resolvers = {
         console.log(error);
       }
     },
-    actualizarCliente: async (_, { id, input }) => {
+    actualizarCliente: async (_, { id, input }, { usuario }) => {
       let cliente = await Cliente.findById(id);
+      //VERIFICAR SI EXISTE
       if (!cliente) {
         throw new Error("Cliente no existe");
       }
+
+      //Verificar si el vendor es correcto
+      const { vendedor } = cliente;
+      if (vendedor.toString() !== usuario.id.toString()) {
+        throw new Error("Cliente de otro vendedor");
+      }
+      //guardar cliente
       cliente = await Cliente.findOneAndUpdate({ _id: id }, input, {
         new: true,
       });
 
       return cliente;
     },
-    eliminarCliente: async (_, { id }) => {
+    eliminarCliente: async (_, { id }, { usuario }) => {
+      //Verify if exist the client
       let cliente = await Cliente.findById(id);
       if (!cliente) {
         throw new Error("Cliente no existe");
       }
+      //verify if the seller it´s correct
+      const { vendedor } = cliente;
+      if (vendedor.toString() !== usuario.id.toString()) {
+        throw new Error("Cliente de otro vendedor");
+      }
+      //delete the client
       await Cliente.findOneAndDelete({ _id: id });
 
       return "Cliente eliminado";
+    },
+    nuevoPedido: async (_, { input }, { usuario }) => {
+      //Verify if the client exist
+      const { cliente, pedido } = input;
+      let clienteExiste = await Cliente.findById(cliente);
+      if (!clienteExiste) throw new Error("EL cliente no existe!");
+
+      //Verify if the client belongs to seller
+      const { vendedor } = clienteExiste;
+      if (vendedor.toString() !== usuario.id)
+        throw new Error("Cliente de otro vendedor");
+
+      //Check the stock of the product
+      for await (const { id, cantidad } of pedido) {
+        const producto = await Producto.findById(id);
+        const { existencia, nombre } = producto;
+        if (cantidad > existencia) {
+          throw new Error(
+            `El producto ${nombre} excede la cantidad disponible`
+          );
+        } else {
+          producto.existencia = existencia - cantidad;
+          await producto.save();
+        }
+      }
+      //Create new order
+      const nuevoPedido = new Pedido(input);
+      //saving a seller to order
+      nuevoPedido.vendedor = usuario.id;
+      //save order
+      const resultado = await nuevoPedido.save();
+      return resultado;
     },
   },
 };

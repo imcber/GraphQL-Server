@@ -34,6 +34,21 @@ type Cliente {
   vendedor: ID
 }
 
+type PedidoGrupo {
+  id: ID
+  cantidad: Int
+}
+
+type Pedido {
+  id: ID
+  pedido: [PedidoGrupo]
+  total: Float
+  cliente: ID
+  vendedor: ID
+  fecha: String
+  estado: EstadoPedido
+}
+
 #INPUTS
 input UsuarioInput {
   nombre: String!
@@ -61,6 +76,24 @@ input ClienteInput {
   telefono: String
 }
 
+input PedidoProductoInput {
+  id: ID
+  cantidad: Int
+}
+
+enum EstadoPedido {
+  PENDIENTE
+  COMPLETADO
+  CANCELADO
+}
+
+input PedidoInput {
+  pedido: [PedidoProductoInput]
+  total: Float!
+  cliente: ID!
+  estado: EstadoPedido!
+}
+
 type Mutation {
   #Usuario
   nuevoUsuario(input: UsuarioInput): Usuario
@@ -75,6 +108,9 @@ type Mutation {
   nuevoCliente(input: ClienteInput): Cliente
   actualizarCliente(id: ID!, input: ClienteInput): Cliente
   eliminarCliente(id: ID!): String
+
+  #Pedidos
+  nuevoPedido(input: PedidoInput): Pedido
 }
 
 type Query {
