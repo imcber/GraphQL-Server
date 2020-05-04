@@ -49,6 +49,15 @@ type Pedido {
   estado: EstadoPedido
 }
 
+type TopCliente {
+  total: Float
+  cliente: [Cliente]
+}
+type TopVendedor {
+  total: Float
+  vendedor: [Usuario]
+}
+
 #INPUTS
 input UsuarioInput {
   nombre: String!
@@ -129,5 +138,10 @@ type Query {
   obtenerPedidos: [Pedido]
   obtenerPedidosVendedor: [Pedido]
   obtenerPedidoID(id: ID!): Pedido
-  obtenerPedidoEstado(estado: EstadoPedido): Pedido
+  obtenerPedidosEstado(estado: String!): [Pedido]
+
+  #Busquedas avanzadas
+  mejoresClientes: [TopCliente]
+  mejoresVendedores: [TopVendedor]
+  buscarProducto(texto: String!): [Producto]
 }
