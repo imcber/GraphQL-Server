@@ -9,21 +9,18 @@ import jwt from "jsonwebtoken";
 require("dotenv").config({ path: "variables.env" });
 
 const creatToken = (usuario, secreta, expiresIn) => {
-  console.log(usuario);
   const { id, email, nombre, apellido } = usuario;
-
-  return jwt.sign({ id }, secreta, { expiresIn });
+  return jwt.sign({ id, email, nombre, apellido }, secreta, { expiresIn });
 };
 
 export const resolvers = {
   Query: {
-    obtenerUsuario: async (_, { token }) => {
-      const usuarioId = await jwt.verify(token, process.env.SECRETA);
-
-      return usuarioId;
+    obtenerUsuario: async (_, {}, { usuario }) => {
+      return usuario;
     },
     obtenerProductos: async () => {
       const productos = await Producto.find({});
+      console.log(productos);
       return productos;
     },
     obtenerProducto: async (_, { id }) => {
@@ -42,6 +39,7 @@ export const resolvers = {
       if (!clientes) {
         throw new Error("Clientes no encontrados");
       }
+
       return clientes;
     },
     obtenerClienteId: async (_, { id }, { usuario }) => {
@@ -150,7 +148,7 @@ export const resolvers = {
       const { email, password } = input;
       const existeUsuario = await Usuario.findOne({ email });
       if (existeUsuario) {
-        throw new Error("EL usuario ya existe");
+        throw new Error("El usuario ya existe");
       }
       const salt = await bcryptjs.genSalt(2);
       input.password = await bcryptjs.hash(password, salt);
@@ -169,7 +167,7 @@ export const resolvers = {
       const existeUsuario = await Usuario.findOne({ email });
       //revisar si usuario existe
       if (!existeUsuario) {
-        throw new Error("EL usuario no existe");
+        throw new Error("El usuario no existe");
       }
 
       //revisar password
@@ -178,7 +176,7 @@ export const resolvers = {
         existeUsuario.password
       );
       if (!passwordCorrecto) {
-        throw new Error("password incorrecto");
+        throw new Error("Password incorrecto");
       }
       //crear token
       return {
