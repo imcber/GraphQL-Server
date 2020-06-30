@@ -20,7 +20,6 @@ export const resolvers = {
     },
     obtenerProductos: async () => {
       const productos = await Producto.find({});
-      console.log(productos);
       return productos;
     },
     obtenerProducto: async (_, { id }) => {
