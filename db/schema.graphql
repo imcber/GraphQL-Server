@@ -45,9 +45,9 @@ type Pedido {
   id: ID
   pedido: [PedidoGrupo]
   total: Float
-  cliente: ID
+  cliente: Cliente
   vendedor: ID
-  fecha: String
+  creado: String
   estado: EstadoPedido
 }
 

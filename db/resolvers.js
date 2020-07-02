@@ -61,7 +61,12 @@ export const resolvers = {
     },
     obtenerPedidosVendedor: async (_, {}, { usuario }) => {
       try {
-        return await Pedido.find({ vendedor: usuario.id.toString() });
+        const pedidos = await Pedido.find({
+          vendedor: usuario.id.toString(),
+        }).populate("cliente");
+        console.log(pedidos);
+
+        return pedidos;
       } catch (error) {
         console.log(error);
       }
