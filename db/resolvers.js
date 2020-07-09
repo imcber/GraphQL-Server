@@ -64,7 +64,6 @@ export const resolvers = {
         const pedidos = await Pedido.find({
           vendedor: usuario.id.toString(),
         }).populate("cliente");
-        console.log(pedidos);
 
         return pedidos;
       } catch (error) {
